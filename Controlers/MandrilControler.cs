@@ -43,7 +43,7 @@ public class MandrilController : ControllerBase
         newmandril);
         ;
     }
-    [HttpPut]
+    [HttpPut("{mandrilid}")]
     public ActionResult<Mandril> PutMandril([FromRoute] int mandrilid, [FromBody] MandrilInsert mandrilinsert)
     {
         var mandril = MandrilDataStore.Current.Mandriles.FirstOrDefault(x => x.id == mandrilid);
@@ -52,9 +52,21 @@ public class MandrilController : ControllerBase
             return NotFound("El mandril que busca no existe");
         }
         mandril.nombre = mandrilinsert.name;
-        mandril.apellido = mandril.apellido;
+        mandril.apellido = mandrilinsert.apellido;
 
         return NoContent();
+    }
+
+    [HttpDelete("{mandrilid}")]
+    public ActionResult<Mandril> DeleteMandril(int mandrilid)
+    {
+        var mandrilAEliminar = MandrilDataStore.Current.Mandriles.FirstOrDefault(x => x.id == mandrilid);
+        if (mandrilAEliminar == null)
+        {
+            return NotFound("El mandril que querias eliminar no existe");
+        }
+        MandrilDataStore.Current.Mandriles.Remove(mandrilAEliminar);
+        return Ok();
     }
 
 }
