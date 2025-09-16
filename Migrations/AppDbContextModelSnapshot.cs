@@ -16,22 +16,58 @@ namespace MiApi.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.9");
 
-            modelBuilder.Entity("Model.Producto", b =>
+            modelBuilder.Entity("MiApi.Models.Habilidad", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Nombre")
+                    b.Property<int?>("Mandrilid")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("nombre")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("Precio")
+                    b.Property<int>("potencia")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("Mandrilid");
+
+                    b.ToTable("Habilidad");
+                });
+
+            modelBuilder.Entity("MiApi.Models.Mandril", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("apellido")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Id");
+                    b.Property<string>("nombre")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
-                    b.ToTable("Productos");
+                    b.HasKey("id");
+
+                    b.ToTable("Mandrils");
+                });
+
+            modelBuilder.Entity("MiApi.Models.Habilidad", b =>
+                {
+                    b.HasOne("MiApi.Models.Mandril", null)
+                        .WithMany("Habilidades")
+                        .HasForeignKey("Mandrilid");
+                });
+
+            modelBuilder.Entity("MiApi.Models.Mandril", b =>
+                {
+                    b.Navigation("Habilidades");
                 });
 #pragma warning restore 612, 618
         }
