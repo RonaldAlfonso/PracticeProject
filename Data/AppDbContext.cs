@@ -1,4 +1,5 @@
 
+using MiApi.Models;
 using Microsoft.EntityFrameworkCore;
 //using Model;
 
@@ -9,7 +10,7 @@ namespace MiApi.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         // Aquí defines tus tablas como DbSet
-        //public DbSet<Producto> Productos { get; set; }
+        public DbSet<Mandril> Mandrils { get; set; }
     }
 
    
