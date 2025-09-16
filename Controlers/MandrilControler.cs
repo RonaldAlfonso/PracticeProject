@@ -54,30 +54,18 @@ public class MandrilController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateMandril(int id, [FromBody]MandrilCreateUpdateDto dto)
     {
-        var mandril = await _context.Mandrils.FindAsync(id);
-        if (mandril == null) return NotFound();
-        
-        if (dto.Nombre != null) mandril.nombre = dto.Nombre;
-        if (dto.Apellido != null) mandril.apellido = dto.Apellido;
-        if(dto.Habilidades != null) mandril.Habilidades = dto.Habilidades;
+        var mandril = await _context.Mandrils
+            .Include(m => m.Habilidades)
+            .FirstOrDefaultAsync(m => m.id == id);
 
-        
-        _context.Entry(mandril).State = EntityState.Modified;
+        if (mandril == null)
+            return NotFound();
 
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
+        mandril.nombre = dto.Nombre;
+        mandril.apellido = dto.Apellido;
 
-            if (!await _context.Mandrils.AnyAsync(m => m.id == id))
-                return NotFound(); 
-
-            throw;
-        }
-
-        return NoContent(); 
+        await _context.SaveChangesAsync();
+        return NoContent();
     }
 
     [HttpDelete("{id}")]
