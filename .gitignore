@@ -1,0 +1,9 @@
+# Compilación de .NET
+bin/
+obj/
+out/
+
+# Archivos de logs y temporales
+*.log
+*.tmp
+*.temp

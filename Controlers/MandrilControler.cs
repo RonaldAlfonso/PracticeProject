@@ -1,22 +1,36 @@
 using Microsoft.AspNetCore.Mvc;
 using MiApi.Models;
 using MiApi.Services;
+using MiApi.Data;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 namespace MiApi.Controllers;
+
 
 [ApiController]
 [Route("api/[controller]")]
 public class MandrilController : ControllerBase
 {
+    private readonly AppDbContext _context;
+
+    public MandrilController(AppDbContext context)
+    {
+        _context = context;
+    }
+
+
+
+
     [HttpGet]
     public ActionResult<IEnumerable<Mandril>> GetMandriles()
     {
-        return Ok(MandrilDataStore.Current.Mandriles);
+        return Ok( _context.Mandriles.ToList());
     }
 
     [HttpGet("{mandrilId}")]
     public ActionResult<Mandril> GetMandril(int mandrilId)
     {
-        var mandril = MandrilDataStore.Current.Mandriles.FirstOrDefault(x => x.id == mandrilId);
+        var mandril = _context.Mandriles.Find(mandrilId);
 
         if (mandril == null)
         {
@@ -25,36 +39,59 @@ public class MandrilController : ControllerBase
         return Ok(mandril);
     }
     [HttpPost]
-    public ActionResult<Mandril> PostMandril(MandrilInsert mandrilinsert)
+    public async Task<ActionResult<Mandril>> PostMandril([FromBody]MandrilInsert mandrilinsert)
     {
-        var mandrilid = MandrilDataStore.Current.Mandriles.Max(x => x.id);
+        
+        if (mandrilinsert == null)
+        {
+            return BadRequest();
+        }
 
         var newmandril = new Mandril()
         {
-            id = mandrilid += 1,
+            
             nombre = mandrilinsert.name,
             apellido = mandrilinsert.apellido
 
         };
-        MandrilDataStore.Current.Mandriles.Add(newmandril);
+        _context.Mandriles.Add(newmandril);
+        await _context.SaveChangesAsync();
 
         return CreatedAtAction((nameof(GetMandril)),
         new { mandrilid = newmandril.id },
         newmandril);
         ;
     }
-    [HttpPut]
-    public ActionResult<Mandril> PutMandril([FromRoute] int mandrilid, [FromBody] MandrilInsert mandrilinsert)
+    [HttpPut("{mandrilid}")]
+    public async Task<ActionResult> PutMandril([FromRoute] int mandrilid, [FromBody] MandrilInsert mandrilinsert)
     {
-        var mandril = MandrilDataStore.Current.Mandriles.FirstOrDefault(x => x.id == mandrilid);
+        if (mandrilinsert == null)
+        {
+            return BadRequest();
+        }
+        var mandril = _context.Mandriles.Find(mandrilid);
         if (mandril == null)
         {
             return NotFound("El mandril que busca no existe");
         }
         mandril.nombre = mandrilinsert.name;
-        mandril.apellido = mandril.apellido;
+        mandril.apellido = mandrilinsert.apellido;
+        await _context.SaveChangesAsync();
 
         return NoContent();
+    }
+
+    [HttpDelete("{mandrilid}")]
+    public async Task<ActionResult<Mandril>> DeleteMandril(int mandrilid)
+    {
+        var mandrilAEliminar = _context.Mandriles.Find(mandrilid);
+        if (mandrilAEliminar == null)
+        {
+            return NotFound("El mandril que querias eliminar no existe");
+        }
+         _context.Mandriles.Remove(mandrilAEliminar);
+        await _context.SaveChangesAsync();
+        return Ok();
     }
 
 }

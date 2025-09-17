@@ -5,6 +5,7 @@ namespace MiApi.Models;
 
 public class Mandril
 {
+    [Key]
     public int id { get; set; }
 
     public string nombre { get; set; } = string.Empty;
@@ -12,6 +13,6 @@ public class Mandril
     public string apellido { get; set; } = string.Empty;
 
     [AllowNull]
-    public List<Habilidad> Habilidades { get; set; }
+    public List<Habilidad> Habilidades { get; set; } = new();
 
 }
